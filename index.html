@@ -1,232 +1,406 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Influencer Monitoring</title>
+  <!-- ======= META / SEO ======= -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Influencer Monitoring • Neo Minimal</title>
+  <meta name="description" content="Minimal black & white website with glow, 3D effects, and n8n-integrated forms for influencer monitoring and contact." />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- ======= BASE STYLES (INLINE) ======= -->
   <style>
-    /* Minimal background */
-    body {
-      font-family: "Poppins", sans-serif;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      overflow: hidden;
-      color: #fff;
-      perspective: 1000px;
+    :root{
+      --bg:#000; --fg:#fff; --muted:#b3b3b3;
+      --card:#0c0c0c; --border:#2a2a2a;
+      --glow:255,255,255; /* white glow */
+      --accent:255,255,255; /* pure white accents */
+      --radius:18px;
+      --shadow-soft:0 20px 60px rgba(255,255,255,.06);
+      --shadow-strong:0 30px 120px rgba(255,255,255,.12);
+      --speed:700ms; --e:ease;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;color:var(--fg);background:var(--bg);
+      font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+
+    /* ======= PARALLAX BACKDROP ======= */
+    .backdrop{
+      position:fixed; inset: -10vh -10vw; z-index:-1;
+      background:
+        radial-gradient(1200px 1200px at var(--x,60%) var(--y,40%),
+          rgba(var(--glow),.08), transparent 60%),
+        radial-gradient(900px 900px at 20% 80%, rgba(var(--glow),.06), transparent 60%),
+        linear-gradient(180deg, #0a0a0a, #000 60%);
+      filter:saturate(0.9) contrast(1.05);
+      transition:background-position .2s linear;
     }
 
-    /* 3D Card */
-    .container {
-      background: rgba(20, 20, 20, 0.9);
-      border-radius: 20px;
-      padding: 40px;
-      width: 420px;
-      text-align: center;
-      box-shadow: 0 15px 40px rgba(255, 255, 255, 0.1),
-                  inset 0 0 20px rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.15);
-      transform-style: preserve-3d;
-      animation: floatCard 6s ease-in-out infinite;
+    /* ======= NAV ======= */
+    .nav{
+      position:sticky; top:0; z-index:10;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 22px; backdrop-filter: blur(10px);
+      background:rgba(255,255,255,.03);
+      border-bottom:1px solid var(--border);
+    }
+    .brand{font-weight:700; letter-spacing:.5px}
+    .links{display:flex; gap:18px}
+    .links a{padding:8px 10px;border-radius:12px;transition:background .2s}
+    .links a:hover{background:rgba(255,255,255,.06);}
+
+    /* ======= SECTIONS WRAP ======= */
+    .wrap{max-width:1100px;margin:0 auto;padding:0 18px}
+
+    /* ======= HERO ======= */
+    .hero{min-height:76vh; display:grid; place-items:center; text-align:center; position:relative}
+    .hero-inner{transform-style:preserve-3d; will-change:transform}
+    .title{
+      font-size:clamp(36px,6vw,60px); font-weight:800; line-height:1.05;
+      text-shadow:0 0 20px rgba(var(--glow),.2), 0 0 50px rgba(var(--glow),.08);
+      animation:glowPulse 3s ease-in-out infinite;
+    }
+    .subtitle{color:var(--muted); margin-top:12px}
+    .cta{
+      margin-top:22px; display:inline-flex; gap:12px; flex-wrap:wrap;
+    }
+    .btn{
+      border:1px solid var(--fg); background:#000; color:#fff;
+      padding:12px 18px; border-radius:999px; font-weight:600;
+      box-shadow:0 0 14px rgba(var(--glow),.2), inset 0 0 14px rgba(var(--glow),.12);
+      transition:transform .2s, box-shadow .2s, background .2s;
+    }
+    .btn:hover{transform:translateY(-2px) scale(1.02); box-shadow:0 0 26px rgba(var(--glow),.35), inset 0 0 18px rgba(var(--glow),.18)}
+    .btn.secondary{background:#0e0e0e}
+
+    /* ======= FEATURES ======= */
+    .grid{display:grid; gap:18px; grid-template-columns:repeat(12,1fr)}
+    .card{
+      grid-column: span 4; background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); padding:22px; box-shadow:var(--shadow-soft);
+      transform-style:preserve-3d; position:relative; overflow:hidden;
+    }
+    .card::after{
+      content:""; position:absolute; inset:-2px; border-radius:inherit;
+      box-shadow:0 0 40px rgba(var(--glow),.08); pointer-events:none;
+    }
+    .card h3{margin:6px 0 6px;font-size:20px}
+    .card p{margin:0;color:var(--muted)}
+    .chip{
+      display:inline-block; font-size:12px; color:#000; background:#fff;
+      border-radius:999px; padding:6px 10px; font-weight:700;
+      box-shadow:0 6px 18px rgba(255,255,255,.2)
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 20px;
-      color: #fff;
-      text-shadow: 0 0 15px #fff, 0 0 30px #aaa;
-      animation: glow 2s infinite alternate;
+    /* ======= FORMS ======= */
+    .section{padding:52px 0}
+    .panel{
+      background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+      padding:24px; box-shadow:var(--shadow-strong); transform-style:preserve-3d; position:relative;
+    }
+    .panel h2{margin:0 0 16px}
+    label{display:block; margin:14px 0 6px; color:var(--muted)}
+    input[type="text"],input[type="email"],textarea{
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid #3a3a3a;
+      background:#0f0f0f; color:#fff; outline:none; transition:border .2s, box-shadow .2s, transform .12s;
+      box-shadow: inset 0 0 12px rgba(255,255,255,.04);
+    }
+    input:focus,textarea:focus{border-color:#fff; box-shadow:0 0 16px rgba(var(--glow),.25), inset 0 0 14px rgba(255,255,255,.08)}
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    .row .col{flex:1 1 220px}
+    .handles{display:flex; flex-wrap:wrap; gap:10px; margin-top:6px}
+    .handle{
+      display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px;
+      border:1px solid #333; background:#121212; cursor:pointer; user-select:none;
+      box-shadow:0 0 10px rgba(var(--glow),.08) inset;
+      transition:transform .15s;
+    }
+    .handle:hover{transform:translateY(-2px)}
+    .handle input{accent-color:#fff; transform:scale(1.2)}
+
+    .note{font-size:13px; color:var(--muted); margin-top:8px}
+
+    .actions{display:flex; gap:12px; margin-top:16px; flex-wrap:wrap}
+    .btn.ghost{background:transparent}
+
+    /* ======= TOAST ======= */
+    .toast{
+      position:fixed; left:50%; bottom:24px; transform:translate(-50%, 40px);
+      background:#0e0e0e; color:#fff; border:1px solid var(--border); border-radius:14px;
+      padding:12px 16px; box-shadow:0 12px 40px rgba(255,255,255,.12);
+      opacity:0; transition:transform .35s var(--e), opacity .35s var(--e);
+      display:flex; align-items:center; gap:10px; pointer-events:none;
+    }
+    .toast.show{opacity:1; transform:translate(-50%, 0)}
+
+    /* ======= FOOTER ======= */
+    footer{padding:40px 18px; text-align:center; color:var(--muted)}
+
+    /* ======= ANIMATIONS / REDUCED MOTION ======= */
+    @keyframes glowPulse{
+      0%,100%{text-shadow:0 0 12px rgba(var(--glow),.15), 0 0 30px rgba(var(--glow),.06)}
+      50%{text-shadow:0 0 28px rgba(var(--glow),.32), 0 0 70px rgba(var(--glow),.12)}
+    }
+    .reveal{opacity:0; transform:translateY(18px); transition:opacity .7s var(--e), transform .7s var(--e)}
+    .reveal.on{opacity:1; transform:none}
+
+    @media (max-width:900px){
+      .card{grid-column: span 6}
+    }
+    @media (max-width:640px){
+      .card{grid-column: span 12}
+      .nav{padding:12px 16px}
     }
 
-    label {
-      font-size: 1rem;
-      display: block;
-      margin: 15px 0 8px;
-      text-align: left;
-      color: #ddd;
-      opacity: 0;
-      animation: fadeSlide 1s ease forwards;
-    }
-
-    input[type="text"],
-    input[type="email"] {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #555;
-      border-radius: 12px;
-      outline: none;
-      font-size: 1rem;
-      background: #111;
-      color: #fff;
-      transition: 0.3s;
-      opacity: 0;
-      animation: fadeSlide 1s ease forwards;
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
-    }
-
-    input[type="text"]:focus,
-    input[type="email"]:focus {
-      border-color: #fff;
-      box-shadow: 0 0 15px #fff, 0 0 25px #aaa;
-    }
-
-    .social {
-      display: flex;
-      justify-content: space-between;
-      margin: 20px 0;
-      flex-wrap: wrap;
-    }
-
-    .social label {
-      display: flex;
-      align-items: center;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transform: scale(0);
-      animation: popIn 0.6s ease forwards;
-      color: #fff;
-      text-shadow: 0 0 8px #fff;
-    }
-
-    input[type="checkbox"] {
-      margin-right: 6px;
-      accent-color: #fff;
-      transform: scale(1.3);
-      transition: transform 0.3s;
-      filter: drop-shadow(0 0 5px #fff);
-    }
-
-    input[type="checkbox"]:hover {
-      transform: scale(1.6) rotate(8deg);
-    }
-
-    .note {
-      font-size: 0.8rem;
-      color: #aaa;
-      margin-top: 10px;
-      animation: fadeIn 1s ease 1.5s forwards;
-      opacity: 0;
-      text-shadow: 0 0 5px #fff;
-    }
-
-    button {
-      margin-top: 20px;
-      padding: 12px 30px;
-      border: none;
-      border-radius: 30px;
-      font-size: 1rem;
-      background: #000;
-      color: #fff;
-      cursor: pointer;
-      animation: pulse 2s infinite;
-      box-shadow: 0 0 12px #fff, inset 0 0 12px #fff;
-      transition: 0.3s;
-      border: 1px solid #fff;
-    }
-
-    button:hover {
-      transform: translateY(-3px) scale(1.1);
-      box-shadow: 0 0 20px #fff, inset 0 0 20px #fff;
-    }
-
-    /* Success popup */
-    .success {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      background: #111;
-      padding: 30px 40px;
-      border-radius: 20px;
-      box-shadow: 0 0 30px #fff, inset 0 0 30px #999;
-      text-align: center;
-      font-size: 1.2rem;
-      color: #fff;
-      animation: popIn 0.6s ease forwards;
-      display: none;
-      border: 1px solid #fff;
-      text-shadow: 0 0 12px #fff;
-    }
-
-    /* Animations */
-    @keyframes fadeSlide {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes glow {
-      from { text-shadow: 0 0 10px #fff, 0 0 20px #aaa; }
-      to { text-shadow: 0 0 25px #fff, 0 0 40px #ddd; }
-    }
-
-    @keyframes popIn {
-      from { transform: scale(0); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 12px #fff, inset 0 0 12px #fff; }
-      50% { transform: scale(1.08); box-shadow: 0 0 25px #fff, inset 0 0 25px #fff; }
-    }
-
-    @keyframes floatCard {
-      0%, 100% { transform: translateY(0) rotateY(0); }
-      50% { transform: translateY(-12px) rotateY(3deg); }
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none!important; transition:none!important}
+      .hero-inner,.card,.panel{transform:none!important}
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1> INFLUENCER MONITORING </h1>
+  <!-- PARALLAX BACKDROP -->
+  <div class="backdrop" aria-hidden="true"></div>
 
-    <form id="influencerForm">
-      <label for="influencer" style="animation-delay:0.2s">Add New Influencer</label>
-      <input type="text" id="influencer" placeholder="Enter influencer name" style="animation-delay:0.3s" required />
+  <!-- NAV -->
+  <header class="nav">
+    <div class="brand">⚡ Neo Minimal</div>
+    <nav class="links" aria-label="Primary">
+      <a href="#home">Home</a>
+      <a href="#features">Features</a>
+      <a href="#influencer">Influencer</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
 
-      <label style="animation-delay:0.5s">Social Media Handle:</label>
-      <div class="social">
-        <label style="animation-delay:1s"><input type="checkbox"/> YouTube</label>
-        <label style="animation-delay:1s"><input type="checkbox" /> Instagram</label>
-        <label style="animation-delay:1s"><input type="checkbox" /> LinkedIn</label>
-        <label style="animation-delay:1.2s"><input type="checkbox" /> TikTok</label>
+  <main class="wrap">
+    <!-- HERO -->
+    <section id="home" class="hero">
+      <div class="hero-inner tilt reveal">
+        <h1 class="title">Influencer Monitoring — Minimal, 3D & Glowy</h1>
+        <p class="subtitle">Black & white aesthetic • smooth animations • ready for n8n + Google Sheets</p>
+        <div class="cta">
+          <a class="btn" href="#influencer">Add Influencers</a>
+          <a class="btn secondary" href="#features">Explore Features</a>
+        </div>
       </div>
+    </section>
 
-      <label for="email" style="animation-delay:1.4s">Your Email</label>
-      <input type="email" id="email" placeholder="Enter your email" style="animation-delay:1.5s" required />
+    <!-- FEATURES -->
+    <section id="features" class="section">
+      <div class="grid">
+        <article class="card tilt reveal">
+          <span class="chip">3D</span>
+          <h3>Subtle 3D & Parallax</h3>
+          <p>Cards gently tilt with your cursor and float with depth for a premium feel.</p>
+        </article>
+        <article class="card tilt reveal">
+          <span class="chip">Glow</span>
+          <h3>Minimal Glow Effects</h3>
+          <p>Pure white glow outlines & soft shadows—no color noise, just focus.</p>
+        </article>
+        <article class="card tilt reveal">
+          <span class="chip">n8n</span>
+          <h3>Backend, No Backend</h3>
+          <p>Hook into an n8n webhook to store entries in Google Sheets instantly.</p>
+        </article>
+      </div>
+    </section>
 
-      <p class="note">*48 hour report will be sent to your email.</p>
+    <!-- INFLUENCER FORM -->
+    <section id="influencer" class="section">
+      <div class="panel tilt reveal" aria-labelledby="infl-h">
+        <h2 id="infl-h">Influencer Monitoring</h2>
 
-      <button type="submit">SUBMIT</button>
-    </form>
-  </div>
+        <form id="influencerForm" novalidate>
+          <div class="row">
+            <div class="col">
+              <label for="influencerName">Add New Influencer</label>
+              <input id="influencerName" name="influencer" type="text" placeholder="e.g. Ali Abdaal" required />
+            </div>
+            <div class="col">
+              <label for="email">Your Email</label>
+              <input id="email" name="email" type="email" placeholder="you@example.com" required />
+            </div>
+          </div>
 
-  <div class="success" id="successPopup">
-    ✅ Submitted Successfully!<br>
-    You will receive your report soon.
-  </div>
+          <label>Social Media Handles</label>
+          <div class="handles" role="group" aria-label="Social handles">
+            <label class="handle"><input type="checkbox" name="handle" value="YouTube" /> YouTube</label>
+            <label class="handle"><input type="checkbox" name="handle" value="Instagram" /> Instagram</label>
+            <label class="handle"><input type="checkbox" name="handle" value="LinkedIn" /> LinkedIn</label>
+            <label class="handle"><input type="checkbox" name="handle" value="TikTok" /> TikTok</label>
+            <label class="handle"><input type="checkbox" name="handle" value="X" /> X (Twitter)</label>
+          </div>
 
+          <p class="note">*A summary report will be emailed every 48 hours.</p>
+
+          <div class="actions">
+            <button class="btn" type="submit">Submit</button>
+            <button class="btn ghost" type="reset">Reset</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- CONTACT FORM -->
+    <section id="contact" class="section">
+      <div class="panel tilt reveal" aria-labelledby="contact-h">
+        <h2 id="contact-h">Contact</h2>
+        <form id="contactForm" novalidate>
+          <div class="row">
+            <div class="col">
+              <label for="cname">Your Name</label>
+              <input id="cname" name="name" type="text" placeholder="Your name" required />
+            </div>
+            <div class="col">
+              <label for="cemail">Your Email</label>
+              <input id="cemail" name="email" type="email" placeholder="you@example.com" required />
+            </div>
+          </div>
+          <label for="cmsg">Message</label>
+          <textarea id="cmsg" name="message" rows="4" placeholder="Tell us how we can help…"></textarea>
+
+          <div class="actions">
+            <button class="btn" type="submit">Send</button>
+            <button class="btn ghost" type="reset">Clear</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite">✅ Done!</div>
+
+  <footer>© <span id="y"></span> Neo Minimal — built with ❤️ + CSS/JS only</footer>
+
+  <!-- ======= INTERACTIVE / ANIMATIONS (INLINE JS) ======= -->
   <script>
+    // Util: qs
+    const $ = (s, root=document) => root.querySelector(s);
+    const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
 
-    
-    const form = document.getElementById("influencerForm");
-    const popup = document.getElementById("successPopup");
+    // Year
+    $("#y").textContent = new Date().getFullYear();
 
-    form.addEventListener("submit", function (e) {
+    // Backdrop parallax (mouse)
+    const backdrop = $(".backdrop");
+    window.addEventListener("pointermove", e=>{
+      const x = (e.clientX / window.innerWidth) * 100;
+      const y = (e.clientY / window.innerHeight) * 100;
+      backdrop.style.setProperty("--x", x + "%");
+      backdrop.style.setProperty("--y", y + "%");
+    });
+
+    // Intersection reveal
+    const io = new IntersectionObserver((entries)=>{
+      for (const e of entries){
+        if (e.isIntersecting) e.target.classList.add("on");
+      }
+    }, { threshold: 0.15 });
+    $$(".reveal").forEach(el=>io.observe(el));
+
+    // Subtle float/tilt on hover
+    const tiltables = $$(".tilt");
+    const maxTilt = 8; // deg
+    tiltables.forEach(card=>{
+      let rect;
+      const onMove = (e)=>{
+        rect ||= card.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width;
+        const py = (e.clientY - rect.top) / rect.height;
+        const rx = (py - .5) * -maxTilt;
+        const ry = (px - .5) * maxTilt;
+        card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+      };
+      const reset = ()=>{ card.style.transform = ""; rect = null; };
+      card.addEventListener("pointerenter", ()=>card.style.transition="transform .15s ease");
+      card.addEventListener("pointermove", onMove);
+      card.addEventListener("pointerleave", ()=>{ card.style.transition="transform .35s ease"; reset(); });
+    });
+
+    // Toast helper
+    const toast = $("#toast");
+    function showToast(msg="✅ Done!"){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(showToast.tid);
+      showToast.tid = setTimeout(()=>toast.classList.remove("show"), 2200);
+    }
+
+    // Basic validators
+    function isEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+    // ===== Influencer form -> n8n webhook =====
+    $("#influencerForm").addEventListener("submit", async (e)=>{
       e.preventDefault();
-      popup.style.display = "block";
-      popup.style.animation = "popIn 0.6s ease forwards";
-      setTimeout(() => {
-        popup.style.display = "none";
-      }, 2500);
-      form.reset();
+      const influencer = $("#influencerName").value.trim();
+      const email = $("#email").value.trim();
+      const handles = $$("input[name='handle']:checked").map(i=>i.value);
+
+      if (!influencer){ showToast("⚠️ Enter influencer name"); return; }
+      if (!isEmail(email)){ showToast("⚠️ Enter a valid email"); return; }
+      if (handles.length === 0){ showToast("⚠️ Pick at least one handle"); return; }
+
+      const payload = { influencer, email, handle: handles.join(", ") };
+
+      try{
+        const res = await fetch("YOUR_N8N_WEBHOOK_URL_HERE", {
+          method:"POST", headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify(payload)
+        });
+        // n8n webhook usually returns 200 + JSON/plain
+        if (!res.ok) throw new Error("Network");
+        showToast("✅ Influencer saved");
+        e.target.reset();
+      }catch(err){
+        console.error(err);
+        showToast("❌ Failed to submit");
+      }
+    });
+
+    // ===== Contact form -> n8n webhook =====
+    $("#contactForm").addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      const name = $("#cname").value.trim();
+      const email = $("#cemail").value.trim();
+      const message = $("#cmsg").value.trim();
+
+      if (!name){ showToast("⚠️ Enter your name"); return; }
+      if (!isEmail(email)){ showToast("⚠️ Enter a valid email"); return; }
+
+      const payload = { name, email, message };
+
+      try{
+        const res = await fetch("YOUR_N8N_WEBHOOK_URL_HERE", {
+          method:"POST", headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("Network");
+        showToast("✅ Message sent");
+        e.target.reset();
+      }catch(err){
+        console.error(err);
+        showToast("❌ Failed to send");
+      }
+    });
+
+    // Keyboard: smooth scroll for internal links
+    $$("a[href^='#']").forEach(a=>{
+      a.addEventListener("click", (ev)=>{
+        const id = a.getAttribute("href");
+        const el = $(id);
+        if (!el) return;
+        ev.preventDefault();
+        el.scrollIntoView({ behavior:"smooth", block:"start" });
+      });
     });
   </script>
 </body>
